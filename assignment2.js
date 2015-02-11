@@ -92,11 +92,21 @@ function sortNodes(nodes) {
 
 // a data structure to store animals and clusters as
 function Node(child1, child2, animal, distance) {
-    this.child1 = child1;
-    this.child2 = child2;
-    this.animal = animal;
-    this.distance = distance;
-    this.height = 0;
+    // if the two nodes are exactly the same (except for name) combine them
+    // instead of making a new node
+    if (distance == 0 && child1) {
+        this.child1 = null;
+        this.child2 = null;
+        this.animal = animal;
+        this.animal[0] = child1.animal[0] + "\\n" + child2.animal[0];
+        this.distance = distance;
+    } else {
+        this.child1 = child1;
+        this.child2 = child2;
+        this.animal = animal;
+        this.distance = distance;
+        this.height = 0;
+    }
 }
 Node.prototype.toString = function () { 
     return (this.child1 ? this.child1.animal[0] : "null") + ", " + 
@@ -114,8 +124,8 @@ Node.prototype.toJSON = function () {
 function nodeHeights(rootNode, offset) {
     rootNode.height = offset;
     if (rootNode.child1) {
-        nodeHeights(rootNode.child1, offset + rootNode.distance + 0/8);
-        nodeHeights(rootNode.child2, offset + rootNode.distance + 0/8);
+        nodeHeights(rootNode.child1, offset + rootNode.distance);
+        nodeHeights(rootNode.child2, offset + rootNode.distance);
     }
 }
 
@@ -147,7 +157,7 @@ function drawTree() {
     var links = tree.links(nodes);
     
     // scale heights
-    nodes.forEach(function (d) { d.y = 5 + 38 * d.height; });
+    nodes.forEach(function (d) { d.y = 5 + 35 * d.height; });
     
     // Create the link lines.
     svgContainer.selectAll(".link")
