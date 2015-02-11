@@ -12,6 +12,7 @@ function zooDataLoaded() {
     
     // split it into arrays
     var animalArray = rawText.split("\n");
+    animalArray.pop(); // last element is empty
     animalArray.forEach(function (x) { dataArray.push(x.split(",")); });
     
     // calculate the weights to be used
@@ -53,8 +54,7 @@ function calculateWeights() {
     }
 }
 
-// sorts the nodes into a tree
-// TODO: make this faster
+// sorts the nodes into a tree (in place)
 function sortNodes(nodes) {
     var minDistance = Infinity;
     var child1 = 0;
@@ -63,7 +63,6 @@ function sortNodes(nodes) {
     if (nodes.length <= 1) {
         return nodes;
     }
-    
     // check all distances, keep track of the smallest one
     for (var i = 0; i < nodes.length; i++) {
         for (var j = i + 1; j < nodes.length; j++) {
@@ -91,13 +90,18 @@ function Node(child1, child2, animal) {
     this.child2 = child2;
     this.animal = animal;
 }
+Node.prototype.toString = function () { 
+    return (this.child1 ? this.child1.animal[0] : "null") + ", " + 
+           (this.child2 ? this.child2.animal[0] : "null") + ", " + 
+           this.animal.toString();
+};
 
 // creates an animal that is the average value of two others
 function averageAnimal(a1, a2) {
-    var result = a1.splice(0);
-    result[0] = a1 + a2;
+    var result = a1.slice(0);
+    result[0] = "internal node";
     for (var i = 1; i < a1.length; i++) {
-        result[i] = (a1[i] + a2[i]) / 2;
+        result[i] = a1[i] / 2 + a2[i] / 2;
     }
     return result;
 }
