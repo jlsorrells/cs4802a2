@@ -114,8 +114,8 @@ Node.prototype.toJSON = function () {
 function nodeHeights(rootNode, offset) {
     rootNode.height = offset;
     if (rootNode.child1) {
-        nodeHeights(rootNode.child1, offset + rootNode.distance + 1/8);
-        nodeHeights(rootNode.child2, offset + rootNode.distance + 1/8);
+        nodeHeights(rootNode.child1, offset + rootNode.distance + 0/8);
+        nodeHeights(rootNode.child2, offset + rootNode.distance + 0/8);
     }
 }
 
@@ -147,7 +147,7 @@ function drawTree() {
     var links = tree.links(nodes);
     
     // scale heights
-    nodes.forEach(function (d) { d.y = 5 + 25 * d.height; });
+    nodes.forEach(function (d) { d.y = 5 + 28 * d.height; });
     
     // Create the link lines.
     svgContainer.selectAll(".link")
@@ -164,14 +164,9 @@ function drawTree() {
       .enter().append("circle")
         .attr("r", 4)
         .attr("cx", function(d) { return d.x; })
-        .attr("cy", function(d) { return d.y; });
-        
-    svgContainer.selectAll(".node")
-        .data(nodes)
-      .enter().append("text")
-        .text(function(d) { if (d.name != "internal node") { return d.name; }; })
-        .attr("x", function(d) { return d.x + 4; })
-        .attr("y", function(d) { return d.y - 4; });
+        .attr("cy", function(d) { return d.y; })
+      .append("title")
+        .text(function (d) { if (d.name != "internal node") { return d.name; } });
 }
 
 
