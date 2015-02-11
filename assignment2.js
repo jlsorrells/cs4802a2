@@ -39,7 +39,7 @@ function distance(animal1, animal2) {
 }
 
 // calculates weights for the distance function to use, so that each attribute is weighted equally
-// even if they are have different scales
+// even if they are have different scales.  
 function calculateWeights() {
     var maxs = [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0];
     var mins = [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0];
@@ -63,10 +63,12 @@ function sortNodes(nodes) {
     var minDistance = Infinity;
     var child1 = 0;
     var child2 = 1;
+    
     // the array is sorted
     if (nodes.length <= 1) {
         return nodes;
     }
+    
     // check all distances, keep track of the smallest one
     for (var i = 0; i < nodes.length; i++) {
         for (var j = i + 1; j < nodes.length; j++) {
@@ -93,7 +95,7 @@ function sortNodes(nodes) {
 // a data structure to store animals and clusters as
 function Node(child1, child2, animal, distance) {
     // if the two nodes are exactly the same (except for name) combine them
-    // instead of making a new node
+    // instead of making a parent with two children
     if (distance == 0 && child1) {
         this.child1 = null;
         this.child2 = null;
@@ -108,11 +110,6 @@ function Node(child1, child2, animal, distance) {
         this.height = 0;
     }
 }
-Node.prototype.toString = function () { 
-    return (this.child1 ? this.child1.animal[0] : "null") + ", " + 
-           (this.child2 ? this.child2.animal[0] : "null") + ", " + 
-           this.animal.toString();
-};
 Node.prototype.toJSON = function () { 
     return "{" + "\"name\":\"" + this.animal[0] + "\",\"height\":" + this.height + 
     ",\"children\":[" + 
@@ -124,6 +121,7 @@ Node.prototype.toJSON = function () {
 function nodeHeights(rootNode, offset) {
     rootNode.height = offset;
     if (rootNode.child1) {
+        // recursively set heights of children
         nodeHeights(rootNode.child1, offset + rootNode.distance);
         nodeHeights(rootNode.child2, offset + rootNode.distance);
     }
@@ -148,7 +146,7 @@ function drawTree() {
     // calculate heights for nodes in the tree
     nodeHeights(NodeArray[0], 0);
     
-    // convert the array to json
+    // parse the JSON
     var myTree = JSON.parse(NodeArray[0].toJSON());
     
     // Compute the layout.
@@ -175,7 +173,7 @@ function drawTree() {
         .attr("r", 3)
         .attr("cx", function(d) { return d.x; })
         .attr("cy", function(d) { return d.y; })
-      .append("title")
+      .append("title") // add tooltips
         .text(function (d) { 
             if (d.name != "internal node") { 
                 return d.name; 
