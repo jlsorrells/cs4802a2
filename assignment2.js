@@ -132,8 +132,8 @@ function averageAnimal(a1, a2) {
 function drawTree() {
     //Make an SVG Container
     var svgContainer = d3.select("body").append("svg")
-                                        .attr("width", 1000)
-                                        .attr("height", 600);
+                                        .attr("width", 1200)
+                                        .attr("height", 800);
     
     // calculate heights for nodes in the tree
     nodeHeights(NodeArray[0], 0);
@@ -142,12 +142,12 @@ function drawTree() {
     var myTree = JSON.parse(NodeArray[0].toJSON());
     
     // Compute the layout.
-    var tree = d3.layout.tree().size([1000, 550]);
+    var tree = d3.layout.tree().size([1200, 750]);
     var nodes = tree.nodes(myTree);
     var links = tree.links(nodes);
     
     // scale heights
-    nodes.forEach(function (d) { d.y = 5 + 28 * d.height; });
+    nodes.forEach(function (d) { d.y = 5 + 38 * d.height; });
     
     // Create the link lines.
     svgContainer.selectAll(".link")
@@ -162,11 +162,15 @@ function drawTree() {
     svgContainer.selectAll(".node")
         .data(nodes)
       .enter().append("circle")
-        .attr("r", 4)
+        .attr("r", 3)
         .attr("cx", function(d) { return d.x; })
         .attr("cy", function(d) { return d.y; })
       .append("title")
-        .text(function (d) { if (d.name != "internal node") { return d.name; } });
+        .text(function (d) { 
+            if (d.name != "internal node") { 
+                return d.name; 
+            } 
+        });
 }
 
 
