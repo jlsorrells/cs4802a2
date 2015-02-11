@@ -21,7 +21,11 @@ function zooDataLoaded() {
     // convert the arrays to Nodes
     dataArray.forEach(function (x) { NodeArray.push(new Node(null, null, x)); });
     
+    // sort the nodes into a tree
     sortNodes(NodeArray);
+    
+    // draw the tree
+    drawTree();
 }
 
 // calculates distance between two animals
@@ -81,6 +85,8 @@ function sortNodes(nodes) {
     nodes.splice(child2, 1);
     nodes.splice(child1, 1);
     nodes.push(new Node(n1, n2, averageAnimal(n1.animal, n2.animal)));
+    
+    // sort the rest
     return sortNodes(nodes);
 }
 
@@ -95,6 +101,12 @@ Node.prototype.toString = function () {
            (this.child2 ? this.child2.animal[0] : "null") + ", " + 
            this.animal.toString();
 };
+Node.prototype.toJSON = function () { 
+    return "{" + "\"name\":\"" + this.animal[0] + "\",\"children\":[" + 
+    (this.child1 ? this.child1.toJSON() + "," : "") + 
+    (this.child2 ? this.child2.toJSON() : "") + "]}";
+};
+
 
 // creates an animal that is the average value of two others
 function averageAnimal(a1, a2) {
@@ -104,6 +116,37 @@ function averageAnimal(a1, a2) {
         result[i] = a1[i] / 2 + a2[i] / 2;
     }
     return result;
+}
+
+function drawTree() {
+    //Make an SVG Container
+    var svgContainer = d3.select("body").append("svg")
+                                        .attr("width", 1000)
+                                        .attr("height", 600);
+                                        
+    var myTree = JSON.parse(NodeArray[0].toJSON());
+    
+    // Compute the layout.
+    var tree = d3.layout.tree().size([1000, 600]);
+    var nodes = tree.nodes(myTree);
+    var links = tree.links(nodes);
+
+    // Create the link lines.
+    svgContainer.selectAll(".link")
+        .data(links)
+      .enter().append("path")
+        .attr("d", d3.svg.diagonal().projection(function(d) { return [d.x, d.y]; }))
+        .attr("stroke", "blue")
+        .attr("stroke-width", 3)
+        .attr("fill", "none");
+
+    // Create the node circles.
+    svgContainer.selectAll(".node")
+        .data(nodes)
+      .enter().append("circle")
+        .attr("r", 6)
+        .attr("cx", function(d) { return d.x; })
+        .attr("cy", function(d) { return d.y; });
 }
 
 
