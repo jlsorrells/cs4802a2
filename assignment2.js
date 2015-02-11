@@ -19,7 +19,7 @@ function zooDataLoaded() {
     calculateWeights();
     
     // convert the arrays to Nodes
-    dataArray.forEach(function (x) { NodeArray.push(new Node(null, null, x)); });
+    dataArray.forEach(function (x) { NodeArray.push(new Node(null, null, x, 0)); });
     
     // sort the nodes into a tree
     sortNodes(NodeArray);
@@ -84,17 +84,19 @@ function sortNodes(nodes) {
     var n2 = nodes[child2]
     nodes.splice(child2, 1);
     nodes.splice(child1, 1);
-    nodes.push(new Node(n1, n2, averageAnimal(n1.animal, n2.animal)));
+    nodes.push(new Node(n1, n2, averageAnimal(n1.animal, n2.animal), minDistance));
     
     // sort the rest
     return sortNodes(nodes);
 }
 
 // a data structure to store animals and clusters as
-function Node(child1, child2, animal) {
+function Node(child1, child2, animal, distance) {
     this.child1 = child1;
     this.child2 = child2;
     this.animal = animal;
+    this.distance = distance;
+    this.height = 0;
 }
 Node.prototype.toString = function () { 
     return (this.child1 ? this.child1.animal[0] : "null") + ", " + 
@@ -102,11 +104,20 @@ Node.prototype.toString = function () {
            this.animal.toString();
 };
 Node.prototype.toJSON = function () { 
-    return "{" + "\"name\":\"" + this.animal[0] + "\",\"children\":[" + 
+    return "{" + "\"name\":\"" + this.animal[0] + "\",\"height\":" + this.height + 
+    ",\"children\":[" + 
     (this.child1 ? this.child1.toJSON() + "," : "") + 
     (this.child2 ? this.child2.toJSON() : "") + "]}";
 };
 
+// calculates the height of a node based on its distance from its children
+function nodeHeights(rootNode, offset) {
+    rootNode.height = offset;
+    if (rootNode.child1) {
+        nodeHeights(rootNode.child1, offset + rootNode.distance + 1/8);
+        nodeHeights(rootNode.child2, offset + rootNode.distance + 1/8);
+    }
+}
 
 // creates an animal that is the average value of two others
 function averageAnimal(a1, a2) {
@@ -123,14 +134,21 @@ function drawTree() {
     var svgContainer = d3.select("body").append("svg")
                                         .attr("width", 1000)
                                         .attr("height", 600);
-                                        
+    
+    // calculate heights for nodes in the tree
+    nodeHeights(NodeArray[0], 0);
+    
+    // convert the array to json
     var myTree = JSON.parse(NodeArray[0].toJSON());
     
     // Compute the layout.
     var tree = d3.layout.tree().size([1000, 550]);
     var nodes = tree.nodes(myTree);
     var links = tree.links(nodes);
-
+    
+    // scale heights
+    nodes.forEach(function (d) { d.y = 5 + 25 * d.height; });
+    
     // Create the link lines.
     svgContainer.selectAll(".link")
         .data(links)
@@ -155,7 +173,6 @@ function drawTree() {
         .attr("x", function(d) { return d.x + 4; })
         .attr("y", function(d) { return d.y - 4; });
 }
-
 
 
 
