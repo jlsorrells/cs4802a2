@@ -127,7 +127,7 @@ function drawTree() {
     var myTree = JSON.parse(NodeArray[0].toJSON());
     
     // Compute the layout.
-    var tree = d3.layout.tree().size([1000, 600]);
+    var tree = d3.layout.tree().size([1000, 550]);
     var nodes = tree.nodes(myTree);
     var links = tree.links(nodes);
 
@@ -137,16 +137,23 @@ function drawTree() {
       .enter().append("path")
         .attr("d", d3.svg.diagonal().projection(function(d) { return [d.x, d.y]; }))
         .attr("stroke", "blue")
-        .attr("stroke-width", 3)
+        .attr("stroke-width", 2)
         .attr("fill", "none");
 
     // Create the node circles.
     svgContainer.selectAll(".node")
         .data(nodes)
       .enter().append("circle")
-        .attr("r", 6)
+        .attr("r", 4)
         .attr("cx", function(d) { return d.x; })
         .attr("cy", function(d) { return d.y; });
+        
+    svgContainer.selectAll(".node")
+        .data(nodes)
+      .enter().append("text")
+        .text(function(d) { if (d.name != "internal node") { return d.name; }; })
+        .attr("x", function(d) { return d.x + 4; })
+        .attr("y", function(d) { return d.y - 4; });
 }
 
 
