@@ -130,7 +130,7 @@ function nodeHeights(rootNode, offset) {
 // creates an animal that is the average value of two others
 function averageAnimal(a1, a2) {
     var result = a1.slice(0);
-    result[0] = "internal node";
+    result[0] = a1[0] + "\\n" + a2[0];
     for (var i = 1; i < a1.length; i++) {
         result[i] = a1[i] / 2 + a2[i] / 2;
     }
@@ -175,9 +175,7 @@ function drawTree() {
         .attr("cy", function(d) { return d.y; })
       .append("title") // add tooltips
         .text(function (d) { 
-            if (d.name != "internal node") { 
-                return d.name; 
-            } 
+            return d.name; 
         });
 }
 
