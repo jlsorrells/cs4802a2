@@ -7,4 +7,7 @@ Animals with all attributes exactly the same (except name and type) have been co
 The vertical distance between a node and its children is proportional to how different the animals are.  
 
 The code for the tree layout was modified from an example at http://bl.ocks.org/mbostock/3184089  
+The tree is drawn using the d3js tree layout, with the y values set so that the vertical distance between a node and its children is proportional to how similar the animals are.   
+
+To build the tree, the program compares each node to each other node, and combines the two nodes that are closest.  This is done until there is only one node left, which is the root node.  
 
